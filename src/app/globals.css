@@ -1,0 +1,292 @@
+@import "tailwindcss";
+@import "@fontsource-variable/bricolage-grotesque";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* ─────────────────────────────────────────────────────────────
+   DENTRACK design tokens
+   Brand: Midnight Navy #101F32 · Deep Blue #142B43 · Dental Teal #19B6AE
+          Ice Blue #DDF5F5 · Cool White #F8FAFC · Slate #64748B
+   ───────────────────────────────────────────────────────────── */
+:root {
+  --navy: #101f32;
+  --deep: #142b43;
+  --teal: #19b6ae;
+  --teal-strong: #0f8f89; /* AA-contrast teal for text on light surfaces */
+  --ice: #ddf5f5;
+  --cool: #f8fafc;
+  --slate: #64748b;
+
+  /* Porcelain: a cool, slightly teal-tinted white that is easy on the eyes */
+  --bg: #f3f6f7;
+  --surface: #ffffff;
+  --surface-2: #eef3f4;
+  --surface-sunken: #e8eef0;
+  --border: #e0e8eb;
+  --border-strong: #c7d3d8;
+  --glow-1: rgb(25 182 174 / 0.16);
+  --glow-2: rgb(110 160 230 / 0.12);
+  /* Shade-guide ornament (porcelain shade tabs A1 → D3) */
+  --shade-a1: #f4ecd9;
+  --shade-a2: #eedfc2;
+  --shade-a3: #e6cfa6;
+  --shade-b2: #ecdcb8;
+  --shade-c2: #d9c9aa;
+  --shade-d3: #d4bc98;
+  --text: #0f1b2b;
+  --text-2: #334155;
+  --muted: #64748b;
+  --primary: #0f8f89;
+  --primary-hover: #0c7a75;
+  --primary-fg: #ffffff;
+  --accent: #ddf5f5;
+  --accent-fg: #0c5f5b;
+  --ring: #19b6ae;
+
+  --ok: #059669;       /* available / completed */
+  --ok-soft: #d1fae5;
+  --occupied: #0f8f89;
+  --occupied-soft: #ccf2ef;
+  --warn: #b45309;     /* due soon */
+  --warn-soft: #fef3c7;
+  --danger: #b4423f;   /* overdue (muted red) */
+  --danger-soft: #fbe4e2;
+  --neutral: #64748b;  /* archived */
+  --neutral-soft: #e2e8f0;
+  --info: #2563eb;
+  --info-soft: #dbeafe;
+
+  /* Categorical chart palette — validated (lightness, chroma, CVD ΔE ≥ 11) against #ffffff */
+  --chart-1: #0e9a92;
+  --chart-2: #3b5ea8;
+  --chart-3: #c77a1e;
+  --chart-4: #9a4f9c;
+  --chart-grid: #e8edf3;
+
+  /* Tray metal */
+  --metal-1: #f3f5f7;
+  --metal-2: #cfd6dd;
+  --metal-3: #aab4be;
+  --metal-edge: #8b96a2;
+  --metal-engrave: #5b6672;
+
+  --shadow-sm: 0 1px 2px rgb(16 31 50 / 0.06);
+  --shadow-md: 0 4px 14px -4px rgb(16 31 50 / 0.12), 0 2px 4px -2px rgb(16 31 50 / 0.06);
+  --shadow-lg: 0 24px 48px -16px rgb(16 31 50 / 0.28);
+}
+
+.dark {
+  --bg: #08121f;
+  --surface: #0f1d2f;
+  --surface-2: #15283e;
+  --surface-sunken: #0b1726;
+  --border: #1c3148;
+  --border-strong: #2a4766;
+  --glow-1: rgb(25 182 174 / 0.14);
+  --glow-2: rgb(80 120 220 / 0.12);
+  --text: #e8eef5;
+  --text-2: #c3cfdc;
+  --muted: #8ea0b5;
+  --primary: #19b6ae;
+  --primary-hover: #2cc9c0;
+  --primary-fg: #06201f;
+  --accent: #123a45;
+  --accent-fg: #9fe5e1;
+  --ring: #19b6ae;
+
+  --ok: #34d399;
+  --ok-soft: #0f3a30;
+  --occupied: #2cc9c0;
+  --occupied-soft: #0f3a3d;
+  --warn: #f2b84b;
+  --warn-soft: #3d2f12;
+  --danger: #f08b85;
+  --danger-soft: #3f1d1f;
+  --neutral: #8ea0b5;
+  --neutral-soft: #1d3047;
+  --info: #7aa7ff;
+  --info-soft: #172c52;
+
+  /* Dark-mode chart steps — validated separately against #101f32 */
+  --chart-1: #159a92;
+  --chart-2: #5b7bd4;
+  --chart-3: #c27d26;
+  --chart-4: #ad62bd;
+  --chart-grid: #1c3149;
+
+  --metal-1: #4a5866;
+  --metal-2: #33404d;
+  --metal-3: #26313c;
+  --metal-edge: #1a232d;
+  --metal-engrave: #b8c4cf;
+
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 6px 18px -6px rgb(0 0 0 / 0.55);
+  --shadow-lg: 0 24px 48px -16px rgb(0 0 0 / 0.7);
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-sunken: var(--surface-sunken);
+  --color-line: var(--border);
+  --color-line-strong: var(--border-strong);
+  --color-ink: var(--text);
+  --color-ink-2: var(--text-2);
+  --color-muted: var(--muted);
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-fg: var(--primary-fg);
+  --color-accent: var(--accent);
+  --color-accent-fg: var(--accent-fg);
+  --color-ring: var(--ring);
+  --color-navy: var(--navy);
+  --color-deep: var(--deep);
+  --color-teal: var(--teal);
+  --color-ice: var(--ice);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+  --color-occupied: var(--occupied);
+  --color-occupied-soft: var(--occupied-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-neutral: var(--neutral);
+  --color-neutral-soft: var(--neutral-soft);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+  --font-display: "Bricolage Grotesque Variable", var(--font-geist-sans), ui-sans-serif, sans-serif;
+
+  --shadow-soft: var(--shadow-sm);
+  --shadow-lift: var(--shadow-md);
+  --shadow-float: var(--shadow-lg);
+
+  --ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "cv11", "ss01";
+  }
+  body {
+    background-color: var(--bg);
+    background-image:
+      radial-gradient(60rem 36rem at 100% -10%, var(--glow-1), transparent 60%),
+      radial-gradient(48rem 30rem at -10% 110%, var(--glow-2), transparent 60%);
+    background-attachment: fixed;
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--teal) 30%, transparent);
+  }
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Type scale (Elements of Typographic Style: modular ~1.2) */
+@utility type-display {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  line-height: 2.375rem;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  font-variation-settings: "wdth" 92, "opsz" 48;
+}
+@utility type-title {
+  font-family: var(--font-display);
+  font-size: 1.1875rem;
+  line-height: 1.5rem;
+  font-weight: 620;
+  letter-spacing: -0.012em;
+}
+@utility type-label {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+@utility type-stat {
+  font-family: var(--font-display);
+  font-size: 1.875rem;
+  line-height: 2.125rem;
+  font-weight: 650;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Brushed-steel texture for trays */
+.brushed {
+  background-image:
+    repeating-linear-gradient(90deg, rgb(255 255 255 / 0.05) 0 1px, transparent 1px 3px),
+    linear-gradient(160deg, var(--metal-1), var(--metal-2) 55%, var(--metal-3));
+}
+
+/* Skeletons */
+.skeleton {
+  background: linear-gradient(90deg, var(--surface-2) 0%, var(--border) 40%, var(--surface-2) 80%);
+  background-size: 300% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
+  border-radius: 6px;
+}
+@keyframes shimmer {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+/* Reduced motion: OS preference or the in-app setting */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+html[data-motion="reduced"] *, html[data-motion="reduced"] *::before, html[data-motion="reduced"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+}
+
+@keyframes menu-in {
+  from { opacity: 0; transform: translateY(-4px) scale(0.98); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes menu-out {
+  from { opacity: 1; }
+  to { opacity: 0; transform: scale(0.98); }
+}
+@keyframes tab-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+
+/* Fine dot grid used on dark brand surfaces */
+.dot-grid { isolation: isolate; }
+.dot-grid::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background-image: radial-gradient(circle at 1px 1px, rgb(255 255 255 / 0.08) 1px, transparent 0);
+  background-size: 20px 20px;
+  border-radius: inherit;
+}

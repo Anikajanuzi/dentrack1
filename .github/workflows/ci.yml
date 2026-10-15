@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/dentrack
+      AUTH_PROVIDER: local
+      ALLOW_LOCAL_AUTH: "true"
+      SESSION_SECRET: ci-only-secret-0123456789abcdefghijklmnop
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run test:db
+      - name: Prepare database for end-to-end tests
+        run: |
+          npm run db:reset
+          printf "DATABASE_URL=%s\nAUTH_PROVIDER=local\nALLOW_LOCAL_AUTH=true\nSESSION_SECRET=%s\n" "$DATABASE_URL" "$SESSION_SECRET" > .env.local
+          npm run db:seed
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - name: End-to-end tests
+        run: |
+          npm start &
+          npx -y wait-on http://localhost:3000/login
+          E2E_BASE_URL=http://localhost:3000 npm run test:e2e
