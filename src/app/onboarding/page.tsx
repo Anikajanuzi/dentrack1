@@ -10,6 +10,7 @@ import { OnboardingWizard } from "./onboarding-wizard";
 import { BrandMark } from "@/components/shell/brand";
 import { getT } from "@/lib/i18n/server";
 import { LanguageSwitch, ThemeSwitch } from "@/components/shell/switches";
+import { T } from "@/components/t";
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getT())("Set up your laboratory") };
@@ -21,7 +22,6 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
   // Creating a laboratory needs the profile row (see ensureProfile).
   await ensureProfile(user);
   const sp = await searchParams;
-  const t = await getT();
   const labs = await asUser(user.id, (tx) => tx<{ is_demo: boolean }[]>`select l.is_demo from laboratory_memberships m join laboratories l on l.id = m.laboratory_id where m.user_id = ${user.id} and m.is_active`);
   if (labs.length > 0 && !sp.add) redirect("/dashboard");
   return (
@@ -35,7 +35,7 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
         <OnboardingWizard hasDemo={labs.some((l) => l.is_demo)} canCancel={labs.length > 0} />
         {!sp.add && (
           <p className="mt-6 text-center text-[12px] text-muted">
-            {t("Joining a colleague's laboratory? Ask them to invite {email}; you'll be added automatically.", { email: user.email })}
+            <T k="Joining a colleague's laboratory? Ask them to invite {email}; you'll be added automatically." vars={{ email: user.email }} />
           </p>
         )}
       </div>

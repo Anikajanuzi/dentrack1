@@ -9,7 +9,7 @@ const walk = (d) => { for (const f of fs.readdirSync(d)) { const p = path.join(d
 walk(root);
 
 const used = new Map();
-const PROPS = new Set(["label", "title", "description", "hint", "heading", "searchPlaceholder", "emptyTitle", "emptyDescription", "sub", "confirmLabel", "body"]);
+const PROPS = new Set(["label", "title", "description", "hint", "heading", "searchPlaceholder", "emptyTitle", "emptyDescription", "sub", "confirmLabel", "body", "k"]);
 const OBJ_PROPS = new Set(["label", "header", "title", "description", "hint", "intro", "why", "body"]);
 for (const file of files) {
   const sf = ts.createSourceFile(file, fs.readFileSync(file, "utf8"), ts.ScriptTarget.Latest, true, file.endsWith("x") ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
