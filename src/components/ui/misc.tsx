@@ -111,3 +111,22 @@ export function Kbd({ children }: { children: React.ReactNode }) {
     </kbd>
   );
 }
+
+/**
+ * "8 seconds ago"-style time. The server and the browser compute it a moment apart, so the
+ * text may legitimately differ by a second at hydration; suppressHydrationWarning covers only
+ * this element's text. It refreshes every 30 seconds so it doesn't go stale on screen.
+ */
+export function RelativeTime({ ts }: { ts: string | Date }) {
+  const { fmt } = useI18n();
+  const [, tick] = React.useReducer((n: number) => n + 1, 0);
+  React.useEffect(() => {
+    const id = setInterval(tick, 30_000);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <time dateTime={new Date(ts).toISOString()} suppressHydrationWarning>
+      {fmt.relative(ts)}
+    </time>
+  );
+}

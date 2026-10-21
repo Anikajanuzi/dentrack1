@@ -10,7 +10,7 @@ import {
   FolderPlus, ArrowRightLeft, PackageOpen, Activity as ActivityIcon, Pencil, StickyNote, Archive, CircleDot, Circle, Layers,
 } from "lucide-react";
 import type { getDashboard } from "@/lib/data/dashboard";
-import { Card, CardHeader, AnimatedNumber, EmptyState } from "@/components/ui/misc";
+import { Card, CardHeader, AnimatedNumber, EmptyState, RelativeTime } from "@/components/ui/misc";
 import { Badge, PriorityBadge } from "@/components/ui/badge";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ChartTooltipBox, axisProps } from "@/components/charts/chart-tooltip";
@@ -352,7 +352,7 @@ export function DashboardView({ d, denied }: { d: Data; denied?: boolean }) {
                         <p className="text-[13px] text-ink">
                           {a.case_id ? <Link href={`/cases/${a.case_id}`} className="hover:text-primary">{t(a.summary)}</Link> : t(a.summary)}
                         </p>
-                        <p className="text-[11px] text-muted">{a.actor ?? t("System")} · {fmt.relative(a.created_at)}</p>
+                        <p className="text-[11px] text-muted">{a.actor ?? t("System")} · <RelativeTime ts={a.created_at} /></p>
                       </div>
                     </li>
                   ))}

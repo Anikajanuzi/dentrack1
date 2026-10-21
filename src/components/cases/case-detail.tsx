@@ -20,7 +20,7 @@ import { updatePricingAction } from "@/lib/actions/costs";
 import { createInvoiceAction } from "@/lib/actions/finance";
 import { Tabs, TabsContent, TabsList } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/misc";
+import { Card, RelativeTime } from "@/components/ui/misc";
 import { Badge, PriorityBadge, StatusBadge } from "@/components/ui/badge";
 import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, Select, Textarea } from "@/components/ui/input";
@@ -597,7 +597,7 @@ function PricingTab({ data }: { data: CaseData }) {
 // Notes & files
 // ─────────────────────────────────────────────────────────────
 function NotesFilesTab({ data }: { data: CaseData }) {
-  const { fmt, t } = useI18n();
+  const { t } = useI18n();
   const router = useRouter();
   const [body, setBody] = React.useState("");
   const [busy, setBusy] = React.useState(false);
@@ -639,7 +639,7 @@ function NotesFilesTab({ data }: { data: CaseData }) {
           {data.notes.map((n) => (
             <motion.li key={n.id} layout initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }} className="group rounded-lg border border-line px-3.5 py-3">
               <div className="flex items-center justify-between gap-2">
-                <p className="text-xs text-muted"><span className="font-medium text-ink-2">{n.author ?? t("Unknown")}</span> · {fmt.relative(n.created_at)}</p>
+                <p className="text-xs text-muted"><span className="font-medium text-ink-2">{n.author ?? t("Unknown")}</span> · <RelativeTime ts={n.created_at} /></p>
                 {(n.author_id === data.perms.userId || data.perms.isAdmin) && (
                   <button onClick={() => del(() => deleteNoteAction(n.id))} className="rounded p-1 text-muted opacity-0 transition-opacity hover:text-danger focus:opacity-100 group-hover:opacity-100" aria-label={t("Delete note")}><Trash2 className="size-3.5" /></button>
                 )}
@@ -663,7 +663,7 @@ function NotesFilesTab({ data }: { data: CaseData }) {
               <FileText className="size-4 shrink-0 text-muted" />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[13px] font-medium">{f.file_name}</p>
-                <p className="text-[11px] text-muted">{(f.size_bytes / 1024).toFixed(f.size_bytes < 102400 ? 1 : 0)} KB · {f.uploader ?? t("Unknown")} · {fmt.relative(f.created_at)}</p>
+                <p className="text-[11px] text-muted">{(f.size_bytes / 1024).toFixed(f.size_bytes < 102400 ? 1 : 0)} KB · {f.uploader ?? t("Unknown")} · <RelativeTime ts={f.created_at} /></p>
               </div>
               <a href={`/api/files/${f.id}`} className="rounded p-1.5 text-muted hover:bg-surface-2 hover:text-ink" aria-label={t("Download {0}", { 0: f.file_name })}><Download className="size-4" /></a>
               {(f.uploaded_by === data.perms.userId || data.perms.isAdmin) && (

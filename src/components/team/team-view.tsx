@@ -10,7 +10,7 @@ import type { getTeam } from "@/lib/data/team";
 import { inviteMemberAction, revokeInvitationAction, saveTechnicianAction, updateMemberAction } from "@/lib/actions/team";
 import { DataTable } from "@/components/ui/data-table";
 import { Button } from "@/components/ui/button";
-import { Card, CardHeader } from "@/components/ui/misc";
+import { Card, CardHeader, RelativeTime } from "@/components/ui/misc";
 import { Dialog } from "@/components/ui/dialog";
 import { Field, Input, Select } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -101,7 +101,7 @@ export function TeamView({ d }: { d: Data }) {
               <ul className="space-y-1.5">
                 {d.invitations.map((i) => (
                   <li key={i.id} className="flex flex-wrap items-center justify-between gap-2 text-[13px]">
-                    <span>{i.email} <span className="text-muted">· {i.role === "admin" ? t("Administrator") : t("Technician")}{i.technician ? t(" (linked to {0})", { 0: i.technician }) : ""} · {t("invited {0}", { 0: fmt.relative(i.created_at) })}</span></span>
+                    <span>{i.email} <span className="text-muted">· {i.role === "admin" ? t("Administrator") : t("Technician")}{i.technician ? t(" (linked to {0})", { 0: i.technician }) : ""} · {(() => { const [pre, post] = t("invited {0}", { 0: "\u0000" }).split("\u0000"); return <>{pre}<RelativeTime ts={i.created_at} />{post}</>; })()}</span></span>
                     <Button size="sm" variant="ghost" onClick={() => act(revokeInvitationAction(i.id))}><X /> {t("Revoke")}</Button>
                   </li>
                 ))}

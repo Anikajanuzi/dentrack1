@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Menu, MenuContent, MenuItem, MenuLabel, MenuSeparator, MenuTrigger } from "@/components/ui/menu";
 import { TooltipProvider, Tooltip } from "@/components/ui/tooltip";
-import { Kbd } from "@/components/ui/misc";
+import { Kbd, RelativeTime } from "@/components/ui/misc";
 import { Button } from "@/components/ui/button";
 import { CommandPalette } from "./command-palette";
 import { LanguageSwitch, ThemeSwitch } from "./switches";
@@ -277,7 +277,7 @@ export function ShadeStrip({ className }: { className?: string }) {
 
 function NotificationBell({ initial }: { initial: ShellProps["notifications"] }) {
   const router = useRouter();
-  const { t, fmt } = useI18n();
+  const { t } = useI18n();
   const [items, setItems] = React.useState(initial.items);
   const [unread, setUnread] = React.useState(initial.unread);
   React.useEffect(() => { setItems(initial.items); setUnread(initial.unread); }, [initial]);
@@ -346,7 +346,7 @@ function NotificationBell({ initial }: { initial: ShellProps["notifications"] })
                   <span className="min-w-0 flex-1">
                     <span className={cn("block text-[13px]", n.read_at ? "text-ink-2" : "font-semibold text-ink")}>{t(n.title)}</span>
                     {n.body && <span className="block text-xs text-muted">{t(n.body)}</span>}
-                    <span className="mt-0.5 block text-[11px] text-muted">{fmt.relative(n.created_at)}</span>
+                    <span className="mt-0.5 block text-[11px] text-muted"><RelativeTime ts={n.created_at} /></span>
                   </span>
                   {!n.read_at && <span className="sr-only">{t("Unread")}</span>}
                 </MenuItem>

@@ -128,9 +128,36 @@ CI (`.github/workflows/ci.yml`) runs all of these against PostgreSQL 16 and a pr
 
 ## Deploying to Vercel
 
-1. Push the repository to GitHub and import it in Vercel (framework: Next.js).
-2. Add the environment variables from `.env.example` (Production and Preview). Use the Supabase **transaction pooler** URL for `DATABASE_URL`.
-3. Deploy, then set the Supabase Site URL / redirect URL to the Vercel domain.
+Vercel runs the website; Supabase provides the database and login. Both have free plans.
+
+**1. Supabase (database + login)**
+1. Create a project at supabase.com. Save the database password you choose.
+2. Apply the migrations: SQL Editor → paste each file from `supabase/migrations/` in filename order (0001 → 0007) and run it. Or with the Supabase CLI: `supabase link --project-ref <ref>` then `supabase db push`. **Do not** run `supabase/local/auth_shim.sql` (it is only for the built-in local database).
+3. Note these values:
+   - Project Settings → Database → Connection string → **Transaction pooler** (port 6543) → `DATABASE_URL`
+   - Project Settings → API → Project URL → `NEXT_PUBLIC_SUPABASE_URL`
+   - Project Settings → API → `anon` public key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+   - (optional) `service_role` key → `SUPABASE_SERVICE_ROLE_KEY`, only to email team invitations. Keep it secret.
+
+**2. Vercel (website)**
+1. Import the GitHub repository in Vercel. Framework: Next.js. Build command and output: leave the defaults.
+2. Add these environment variables (Production and Preview):
+
+| Variable | Value |
+| --- | --- |
+| `DATABASE_URL` | Supabase transaction pooler URL (port 6543) |
+| `DATABASE_POOL_SIZE` | `5` |
+| `AUTH_PROVIDER` | `supabase` |
+| `NEXT_PUBLIC_SUPABASE_URL` | `https://<project-ref>.supabase.co` |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | the anon key |
+| `NEXT_PUBLIC_SITE_URL` | your Vercel address, e.g. `https://dentrack.vercel.app` |
+| `SUPABASE_SERVICE_ROLE_KEY` | optional (invitation emails) |
+
+   Do **not** set `SESSION_SECRET`, `ALLOW_LOCAL_AUTH` or `AUTH_PROVIDER=local` on Vercel; those are for local use.
+3. Deploy. Then in Supabase → Authentication → URL Configuration, set the Site URL to your Vercel address and add `https://<your-vercel-domain>/auth/callback` to the redirect URLs.
+4. Open the site, create an account, confirm the email, then create your laboratory or choose **Explore with demo data first**.
+
+The demo accounts (`owner@demo.dentrack.test`) exist only in the built-in local database, not on Supabase.
 
 The app has no other services: files attached to cases are stored in PostgreSQL (≤ 10 MB each) under the same RLS.
 
