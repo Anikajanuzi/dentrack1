@@ -159,6 +159,11 @@ Vercel runs the website; Supabase provides the database and login. Both have fre
 
 The demo accounts (`owner@demo.dentrack.test`) exist only in the built-in local database, not on Supabase.
 
+**If the live site shows an error**
+- A page titled **“DENTRACK needs a few settings”** lists the environment variables that are missing or wrong (names only, never values). Fix them in Vercel, then **redeploy**: Vercel only applies changed variables to new deployments.
+- Open **`/api/health`** on your site. It checks the settings, the database connection, whether all migrations were applied, the Row Level Security role, and whether Supabase accepts the anon key, and says what to fix. It shows no secrets.
+- Still a 500? Vercel → Project → Logs (or Deployments → the deployment → Functions) shows the server error message.
+
 The app has no other services: files attached to cases are stored in PostgreSQL (≤ 10 MB each) under the same RLS.
 
 ## Known limits

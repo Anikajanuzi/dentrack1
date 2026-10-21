@@ -41,6 +41,12 @@ export const env = {
     return process.env.SUPABASE_SERVICE_ROLE_KEY;
   },
   get siteUrl() {
-    return process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+    // Links in emails (confirmation, password reset). On Vercel, fall back to the production
+    // domain Vercel provides, so links never point at localhost on a live site.
+    const explicit = process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "");
+    if (explicit) return explicit;
+    if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+    return "http://localhost:3000";
   },
 };
