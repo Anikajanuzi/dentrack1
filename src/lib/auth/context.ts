@@ -3,6 +3,7 @@ import { cache } from "react";
 import { redirect } from "next/navigation";
 import { asUser, type Tx } from "@/lib/db";
 import { getSessionUser, type SessionUser } from "./session";
+import { ensureProfile } from "./profile";
 
 export type Role = "admin" | "technician";
 
@@ -33,9 +34,12 @@ export interface AppContext {
 /** Load identity, active laboratory and permissions. Redirects when signed out / not onboarded. */
 export const getContext = cache(async (): Promise<AppContext> => {
   const session = await getSessionUser();
-  if (!session) redirect("/login");
+  // The proxy already let this request through as signed in. If the server disagrees (e.g. the
+  // session expired in between), say so on the login page; the `error` flag stops the proxy from
+  // bouncing a signed-in visitor straight back here, which would loop.
+  if (!session) redirect("/login?error=session");
 
-  const data = await asUser(session.id, async (tx) => {
+  const load = () => asUser(session.id, async (tx) => {
     const [profile] = await tx<{ full_name: string | null; theme: string; reduced_motion: boolean; active_laboratory_id: string | null }[]>`
       select full_name, theme, reduced_motion, active_laboratory_id from profiles where id = ${session.id}`;
     const memberships = await tx<Array<{ id: string; name: string; is_demo: boolean; role: Role; can_manage_costs: boolean }>>`
@@ -46,7 +50,12 @@ export const getContext = cache(async (): Promise<AppContext> => {
     return { profile, memberships };
   });
 
-  if (!data.profile) redirect("/login?error=profile");
+  let data = await load();
+  if (!data.profile) {
+    // Account created before the migrations ran: create the missing profile instead of redirecting.
+    if (await ensureProfile(session)) data = await load();
+    if (!data.profile) redirect("/login?error=profile");
+  }
   if (data.memberships.length === 0) redirect("/onboarding");
 
   const active =

@@ -16,7 +16,7 @@ const schema = z.object({
 
 export async function createLaboratoryAction(input: z.infer<typeof schema>): Promise<ActionResult> {
   const user = await getSessionUser();
-  if (!user) redirect("/login");
+  if (!user) redirect("/login?error=session");
   const p = schema.safeParse(input);
   if (!p.success) return fromZod(p.error);
   try {
@@ -30,7 +30,7 @@ export async function createLaboratoryAction(input: z.infer<typeof schema>): Pro
 
 export async function createDemoAction(): Promise<ActionResult> {
   const user = await getSessionUser();
-  if (!user) redirect("/login");
+  if (!user) redirect("/login?error=session");
   try {
     await asUser(user.id, (tx) => tx`select create_demo_laboratory()`);
   } catch (e) {

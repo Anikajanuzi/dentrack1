@@ -10,6 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
 const NOTICES: Record<string, string> = {
   link: "That link has expired or was already used. Request a new one.",
   profile: "Your account isn't fully set up. Sign in again.",
+  session: "Your session has ended. Sign in again.",
 };
 
 export default async function LoginPage({ searchParams }: { searchParams: Promise<{ next?: string; error?: string }> }) {

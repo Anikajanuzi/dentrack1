@@ -64,7 +64,9 @@ export async function proxy(request: NextRequest) {
     url.search = pathname === "/" ? "" : `?next=${encodeURIComponent(pathname + search)}`;
     return NextResponse.redirect(url);
   }
-  if (signedIn && (pathname === "/login" || pathname === "/signup")) {
+  // Signed-in visitors skip the login and sign-up pages — unless the app sent them there to report a
+  // problem (?error=…). Redirecting those back to the dashboard would loop forever.
+  if (signedIn && (pathname === "/login" || pathname === "/signup") && !request.nextUrl.searchParams.has("error")) {
     return NextResponse.redirect(new URL("/dashboard", request.url));
   }
   return response;

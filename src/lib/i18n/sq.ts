@@ -115,6 +115,7 @@ export const SQ: Record<string, string> = {
   "Password updated.": "Fjalëkalimi u përditësua.",
   "Passwords don't match": "Fjalëkalimet nuk përputhen",
   "That link has expired or was already used. Request a new one.": "Ajo lidhje ka skaduar ose është përdorur. Kërkoni një të re.",
+  "Your session has ended. Sign in again.": "Seanca juaj ka përfunduar. Hyni sërish.",
   "Your account isn't fully set up. Sign in again.": "Llogaria juaj nuk është konfiguruar plotësisht. Hyni sërish.",
   "Enter a valid email address": "Shkruani një adresë email të vlefshme",
   "Enter a valid email": "Shkruani një email të vlefshëm",
