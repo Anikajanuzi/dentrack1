@@ -41,7 +41,7 @@ export function FinanceView({ d }: { d: Data }) {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line lg:grid-cols-4">
+      <div data-tour="finance-summary" className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-line bg-line lg:grid-cols-4">
         {[
           ["Outstanding receivables", fmt.money(sum(open.map((i) => i.outstanding)), cur), t("{0} open invoices", { 0: open.filter((i) => D(i.outstanding).gt(0)).length })],
           ["Past due", fmt.money(sum(overdueInv.map((i) => i.outstanding)), cur), t("{0} invoices after their due date", { 0: overdueInv.length })],
@@ -77,7 +77,7 @@ export function FinanceView({ d }: { d: Data }) {
               onRowClick={(i) => router.push(`/finance/invoices/${i.invoice_id}`)}
               initialSort={{ key: "date", dir: "desc" }}
               minWidth={820}
-              empty={{ title: "No invoices yet", icon: <Receipt />, body: "Bill completed cases with New invoice." }}
+              empty={{ title: "No invoices yet", icon: <Receipt />, body: "An invoice bills a clinic for finished cases. When work is completed, choose New invoice and pick the cases to bill." }}
               columns={[
                 { key: "num", header: "Invoice", sort: (i) => i.number, render: (i) => <Link href={`/finance/invoices/${i.invoice_id}`} onClick={(e) => e.stopPropagation()} className="font-semibold hover:text-primary">{i.number}</Link> },
                 { key: "clinic", header: "Clinic", sort: (i) => i.clinic, render: (i) => <span className="text-ink-2">{i.clinic}</span> },
@@ -97,7 +97,7 @@ export function FinanceView({ d }: { d: Data }) {
               searchPlaceholder="Search payments"
               initialSort={{ key: "date", dir: "desc" }}
               minWidth={760}
-              empty={{ title: "No payments recorded", icon: <Wallet /> }}
+              empty={{ title: "No payments recorded", icon: <Wallet />, body: "When a clinic pays, choose Record payment. You can match the money to one or more of their invoices." }}
               columns={[
                 { key: "date", header: "Received", sort: (p) => p.payment_date, render: (p) => <span className="tabular">{fmt.day(p.payment_date)}</span> },
                 { key: "clinic", header: "Clinic", sort: (p) => p.clinic, render: (p) => <Link href={`/clinics/${p.clinic_id}`} className="hover:text-primary">{p.clinic}</Link> },

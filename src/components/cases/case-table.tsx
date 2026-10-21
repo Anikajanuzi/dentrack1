@@ -97,10 +97,10 @@ export function CaseTable({
         <span className="ml-auto text-[13px] text-muted tabular" aria-live="polite">{tn(total, "{n} case", "{n} cases")}</span>
       </div>
 
-      <div className={cn("overflow-x-auto rounded-xl border border-line bg-surface shadow-soft transition-opacity", pending && "opacity-60")}>
+      <div data-tour="case-list" className={cn("overflow-x-auto rounded-xl border border-line bg-surface shadow-soft transition-opacity", pending && "opacity-60")}>
         {rows.length === 0 ? (
           <EmptyState icon={<ClipboardList />} title={anyFilter ? t("No cases match these filters") : archived ? t("The archive is empty") : t("No cases yet")}>
-            {anyFilter ? t("Try a broader search.") : archived ? t("Delivered or cancelled cases appear here once archived.") : <Link className="text-primary hover:underline" href="/cases/new">{t("Create the first case")}</Link>}
+            {anyFilter ? t("Try a broader search.") : archived ? t("Delivered or cancelled cases appear here once archived.") : <>{t("A case is one piece of work a clinic sends you, from intake to delivery.")} <Link className="font-medium text-primary hover:underline" href="/cases/new">{t("Create the first case")}</Link></>}
           </EmptyState>
         ) : (
           <table className="w-full min-w-[860px] text-left text-[13px]">

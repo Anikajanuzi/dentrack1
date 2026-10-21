@@ -9,8 +9,8 @@ const walk = (d) => { for (const f of fs.readdirSync(d)) { const p = path.join(d
 walk(root);
 
 const used = new Map();
-const PROPS = new Set(["label", "title", "description", "hint", "heading", "searchPlaceholder", "emptyTitle", "emptyDescription", "sub", "confirmLabel"]);
-const OBJ_PROPS = new Set(["label", "header", "title", "description", "hint"]);
+const PROPS = new Set(["label", "title", "description", "hint", "heading", "searchPlaceholder", "emptyTitle", "emptyDescription", "sub", "confirmLabel", "body"]);
+const OBJ_PROPS = new Set(["label", "header", "title", "description", "hint", "intro", "why", "body"]);
 for (const file of files) {
   const sf = ts.createSourceFile(file, fs.readFileSync(file, "utf8"), ts.ScriptTarget.Latest, true, file.endsWith("x") ? ts.ScriptKind.TSX : ts.ScriptKind.TS);
   const visit = (n) => {
@@ -24,6 +24,12 @@ for (const file of files) {
       used.set(n.initializer.text, path.relative(process.cwd(), file));
     if (ts.isPropertyAssignment(n) && OBJ_PROPS.has(n.name.getText(sf)) && ts.isStringLiteral(n.initializer) && /^[A-Z]/.test(n.initializer.text) && !/[a-z]-[a-z]|[{}<>]/.test(n.initializer.text))
       used.set(n.initializer.text, path.relative(process.cwd(), file));
+    // Tour step bullet lists: points: ["…", "…"]
+    if (ts.isPropertyAssignment(n) && n.name.getText(sf) === "points" && ts.isArrayLiteralExpression(n.initializer))
+      for (const el of n.initializer.elements) if (ts.isStringLiteral(el)) used.set(el.text, path.relative(process.cwd(), file));
+    // Lists of [icon, "label"] pairs and label maps rendered through t()
+    if (ts.isArrayLiteralExpression(n) && n.elements.length === 2 && ts.isIdentifier(n.elements[0]) && ts.isStringLiteral(n.elements[1]) && /^[A-Z][a-z]/.test(n.elements[1].text))
+      used.set(n.elements[1].text, path.relative(process.cwd(), file));
     ts.forEachChild(n, visit);
   };
   visit(sf);

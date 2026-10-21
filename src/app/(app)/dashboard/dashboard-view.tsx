@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import type { getDashboard } from "@/lib/data/dashboard";
 import { Card, CardHeader, AnimatedNumber, EmptyState, RelativeTime } from "@/components/ui/misc";
+import { GettingStarted } from "@/components/tutorial/getting-started";
 import { Badge, PriorityBadge } from "@/components/ui/badge";
 import { Tooltip } from "@/components/ui/tooltip";
 import { ChartTooltipBox, axisProps } from "@/components/charts/chart-tooltip";
@@ -111,7 +112,8 @@ export function DashboardView({ d, denied }: { d: Data; denied?: boolean }) {
       </motion.section>
 
       {/* Key figures */}
-      <motion.div variants={rise} className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-8">
+      {d.setup && <motion.div variants={rise}><GettingStarted setup={d.setup} /></motion.div>}
+      <motion.div variants={rise} data-tour="dashboard-stats" className="grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-8">
         {stats.map((s) => (
           <Link
             key={s.label}
@@ -132,7 +134,7 @@ export function DashboardView({ d, denied }: { d: Data; denied?: boolean }) {
         ))}
       </motion.div>
 
-      <div className="grid gap-6 xl:grid-cols-[1.35fr_1fr]">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.35fr_1fr]">
         {/* Laboratory overview */}
         <motion.div variants={rise}>
           <Card className="h-full">
@@ -240,7 +242,7 @@ export function DashboardView({ d, denied }: { d: Data; denied?: boolean }) {
         </motion.div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         <motion.div variants={rise} className="xl:col-span-2">
           <Card className="h-full">
             <CardHeader title="Cases completed per week" description="Last 8 weeks, by completion date" />

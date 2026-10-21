@@ -43,16 +43,23 @@ export async function GET() {
       await sql`select 1`;
       checks.push({ name: "database connection", ok: true });
 
-      const [t] = await sql<{ labs: string | null; profiles: string | null; users: string | null; fn: string | null }[]>`
+      const [t] = await sql<{ labs: string | null; profiles: string | null; users: string | null; fn: string | null; tour: string | null }[]>`
         select to_regclass('public.laboratories')::text as labs,
                to_regclass('public.profiles')::text as profiles,
                to_regclass('auth.users')::text as users,
-               to_regprocedure('public.money_as_text(jsonb)')::text as fn`;
+               to_regprocedure('public.money_as_text(jsonb)')::text as fn,
+               to_regclass('public.tutorial_progress')::text as tour`;
       const missing = [!t.users && "auth.users (is this a Supabase database?)", !t.labs && "public.laboratories", !t.profiles && "public.profiles", !t.fn && "migration 0007 (money_as_text)"].filter(Boolean);
       checks.push({
         name: "database tables (migrations)",
         ok: missing.length === 0,
         detail: missing.length ? `Missing: ${missing.join(", ")}. Run every file in supabase/migrations in order (0001 → 0007).` : "All migrations applied.",
+      });
+      // Optional: without it the guided tour keeps progress in the browser, so it doesn't fail the check.
+      checks.push({
+        name: "tutorial progress (migration 0008)",
+        ok: true,
+        detail: t.tour ? "Applied." : "Not applied yet. Tour progress is kept in each browser until you run supabase/migrations/20261021000008_tutorial_progress.sql.",
       });
 
       // The app runs each request as the `authenticated` role so Row Level Security applies.

@@ -8,7 +8,7 @@ import { Dialog as RD } from "radix-ui";
 import { toast } from "@/lib/toast";
 import {
   Archive, BarChart3, Bell, Building2, Check, ChevronsLeft, ChevronsRight, ClipboardList, FlaskConical,
-  LayoutDashboard, LogOut, Menu as MenuIcon, Receipt, Search, Settings, Users, X, Grid3x3, CheckCheck,
+  LayoutDashboard, LogOut, Menu as MenuIcon, Receipt, Search, Settings, Users, X, Grid3x3, CheckCheck, Compass,
 } from "lucide-react";
 import { Menu, MenuContent, MenuItem, MenuLabel, MenuSeparator, MenuTrigger } from "@/components/ui/menu";
 import { TooltipProvider, Tooltip } from "@/components/ui/tooltip";
@@ -17,6 +17,8 @@ import { Button } from "@/components/ui/button";
 import { CommandPalette } from "./command-palette";
 import { LanguageSwitch, ThemeSwitch } from "./switches";
 import { BrandMark } from "./brand";
+import { HelpMenu } from "@/components/tutorial/help-menu";
+import { useTour } from "@/components/tutorial/tour-provider";
 import { useI18n } from "@/components/i18n-provider";
 import { signOut } from "@/app/(auth)/actions";
 import { markNotificationsReadAction, savePreferencesAction, switchLabAction } from "@/lib/actions/shell";
@@ -160,7 +162,7 @@ export function AppShell({ user, lab, labs, role, notifications, children }: She
               </Button>
               <button
                 onClick={() => setPaletteOpen(true)}
-                className="group flex h-10 w-full max-w-md items-center gap-2.5 rounded-full border border-line bg-surface/80 px-4 text-[13px] text-muted shadow-soft transition-[border-color,box-shadow] hover:border-teal/40 hover:shadow-lift"
+                className="group flex h-10 w-full min-w-0 max-w-md items-center gap-2.5 rounded-full border border-line bg-surface/80 px-4 text-[13px] text-muted shadow-soft transition-[border-color,box-shadow] hover:border-teal/40 hover:shadow-lift"
                 aria-label={t("Search (Ctrl+K)")}
               >
                 <Search className="size-4 transition-colors group-hover:text-primary" />
@@ -175,6 +177,7 @@ export function AppShell({ user, lab, labs, role, notifications, children }: She
                   <ThemeSwitch onChange={saveTheme} />
                   <LanguageSwitch />
                 </div>
+                <HelpMenu showChecklistOption={role === "admin" && !lab.is_demo} />
                 <NotificationBell initial={notifications} />
                 <UserMenu user={user} lab={lab} labs={labs} role={role} />
               </div>
@@ -361,6 +364,7 @@ function NotificationBell({ initial }: { initial: ShellProps["notifications"] })
 
 function UserMenu({ user, lab, labs, role }: { user: ShellProps["user"]; lab: ShellProps["lab"]; labs: ShellProps["labs"]; role: string }) {
   const router = useRouter();
+  const tour = useTour();
   const { t } = useI18n();
   async function switchTo(id: string) {
     const r = await switchLabAction(id);
@@ -403,6 +407,7 @@ function UserMenu({ user, lab, labs, role }: { user: ShellProps["user"]; lab: Sh
         )}
         <MenuItem onSelect={() => router.push("/settings")}><Settings /> {t("Settings")}</MenuItem>
         <MenuItem onSelect={() => router.push("/onboarding?add=1")}><FlaskConical /> {t("Add or try a laboratory")}</MenuItem>
+        {tour && <MenuItem onSelect={tour.start}><Compass /> {t("Guided tour")}</MenuItem>}
         <MenuSeparator />
         <MenuItem destructive onSelect={() => signOut()}><LogOut /> {t("Sign out")}</MenuItem>
       </MenuContent>

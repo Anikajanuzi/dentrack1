@@ -18,10 +18,10 @@ import type { getNewCaseOptions } from "@/lib/data/cases";
 
 type Options = Awaited<ReturnType<typeof getNewCaseOptions>>;
 
-function Section({ title, description, children }: { title: string; description?: string; children: React.ReactNode }) {
+function Section({ title, description, children, tour }: { title: string; description?: string; children: React.ReactNode; tour?: string }) {
   const { t } = useI18n();
   return (
-    <Card className="grid gap-6 p-5 md:grid-cols-[220px_1fr] md:p-6">
+    <Card data-tour={tour} className="grid gap-6 p-5 md:grid-cols-[220px_1fr] md:p-6">
       <div>
         <h2 className="font-display text-[16px] font-semibold text-ink">{t(title)}</h2>
         {description && <p className="mt-1 text-[13px] text-muted">{t(description)}</p>}
@@ -75,7 +75,7 @@ export function CaseForm({ o, presetTray }: { o: Options; presetTray?: string })
 
   return (
     <form onSubmit={onSubmit} noValidate className="flex flex-col gap-4">
-      <Section title={t("Patient and clinic")} description="A patient reference is enough. Add a name only if the lab needs it.">
+      <Section tour="case-form" title={t("Patient and clinic")} description="A patient reference is enough. Add a name only if the lab needs it.">
         <Field label="Dental clinic" htmlFor="clinic_id" error={errors.clinic_id?.message} required>
           <Select id="clinic_id" aria-invalid={!!errors.clinic_id} {...register("clinic_id")}>
             <option value="">{t("Choose a clinic")}</option>

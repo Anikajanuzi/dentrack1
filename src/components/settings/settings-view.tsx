@@ -21,6 +21,7 @@ import { Switch } from "@/components/ui/switch";
 import { Badge } from "@/components/ui/badge";
 import { Dialog } from "@/components/ui/dialog";
 import { cn, trayCode } from "@/lib/utils";
+import { HelpCard } from "@/components/tutorial/help-menu";
 
 type Data = Awaited<ReturnType<typeof getSettings>>;
 type R = { ok: boolean; error?: string; message?: string; fieldErrors?: Record<string, string> };
@@ -103,6 +104,7 @@ function Appearance({ d }: { d: Data }) {
         </div>
         <Switch checked={reduced} onCheckedChange={(v) => { setReduced(v); document.documentElement.dataset.motion = v ? "reduced" : ""; act(savePreferencesAction({ reducedMotion: v }), { quiet: true }); }} aria-label={t("Reduce motion")} />
       </Card>
+      <HelpCard showChecklistOption={d.isAdmin && !d.lab.is_demo} />
       <Card className="p-5">
         <h2 className="text-[15px] font-semibold">{t("Your name")}</h2>
         <form className="mt-3 flex max-w-md gap-2" onSubmit={(e) => { e.preventDefault(); act(savePreferencesAction({ fullName: name })); }}>

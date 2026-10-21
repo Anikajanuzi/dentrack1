@@ -44,7 +44,7 @@ export function TeamView({ d }: { d: Data }) {
             <Button size="sm" variant="secondary" onClick={() => setDialog("invite")}><MailPlus /> {t("Invite user")}</Button>
           </>
         ) : undefined}
-        empty={{ title: "No technicians yet", icon: <Users />, body: "Add the people who work on cases." }}
+        empty={{ title: "No technicians yet", icon: <Users />, body: "Add the people who work on cases. They don't need a login; invite them later if they should sign in." }}
         columns={[
           { key: "name", header: "Technician", sort: (item: T) => item.full_name, render: (item: T) => (
             <span className="flex items-center gap-3">

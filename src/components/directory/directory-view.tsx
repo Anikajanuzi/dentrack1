@@ -41,7 +41,7 @@ export function DirectoryView({ data }: { data: Data }) {
             onRowClick={(c) => router.push(`/clinics/${c.id}`)}
             initialSort={{ key: "name", dir: "asc" }}
             toolbar={data.isAdmin ? <Button size="sm" onClick={() => setAdding(true)}><Plus /> {t("Add clinic")}</Button> : undefined}
-            empty={{ title: "No clinics yet", icon: <Building2 />, body: data.isAdmin ? "Add the dental clinics you work with." : "An administrator adds clinics." }}
+            empty={{ title: "No clinics yet", icon: <Building2 />, body: data.isAdmin ? "Add the dental practices that send you work. You choose a clinic every time you create a case." : "An administrator adds clinics." }}
             columns={[
               { key: "name", header: "Clinic", sort: (c) => c.name, render: (c) => <Link href={`/clinics/${c.id}`} className="font-semibold text-ink hover:text-primary" onClick={(e) => e.stopPropagation()}>{c.name}{!c.is_active && <Badge tone="neutral" className="ml-2">{t("Inactive")}</Badge>}</Link> },
               { key: "dentists", header: "Dentists", render: (c) => <span className="text-ink-2">{c.dentists?.join(", ") ?? "—"}</span> },
@@ -59,7 +59,7 @@ export function DirectoryView({ data }: { data: Data }) {
             searchPlaceholder="Search patient reference or name"
             onRowClick={(p) => router.push(`/patients/${p.id}`)}
             initialSort={{ key: "ref", dir: "asc" }}
-            empty={{ title: "No patients yet", icon: <User />, body: "Patients are created with their first case." }}
+            empty={{ title: "No patients yet", icon: <User />, body: "You don't add patients here: a patient record is created automatically with their first case." }}
             columns={[
               { key: "ref", header: "Reference", sort: (p) => p.reference, render: (p) => <Link href={`/patients/${p.id}`} onClick={(e) => e.stopPropagation()} className="font-semibold text-ink hover:text-primary">{p.reference}</Link> },
               { key: "name", header: "Name", sort: (p) => p.full_name ?? "", render: (p) => <span className="text-ink-2">{p.full_name ?? "—"}</span> },

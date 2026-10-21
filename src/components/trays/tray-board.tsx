@@ -117,7 +117,7 @@ export function TrayBoard(props: Props) {
   return (
     <div className="flex flex-col gap-5">
       {/* Occupancy strip */}
-      <div className="grid gap-4 rounded-xl border border-line bg-surface p-4 shadow-soft md:grid-cols-[1fr_auto] md:items-center">
+      <div data-tour="tray-board" className="grid gap-4 rounded-xl border border-line bg-surface p-4 shadow-soft md:grid-cols-[1fr_auto] md:items-center">
         <div>
           <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
             <p className="text-[13px] text-muted">
@@ -250,8 +250,8 @@ export function TrayBoard(props: Props) {
           variants={{ show: { transition: { staggerChildren: 0.018 } } }}
         >
           <AnimatePresence mode="popLayout" initial={false}>
-            {filtered.map((item) => (
-              <TrayTile key={item.tray_id} tray={item} today={today} dueSoonDays={dueSoonDays} selected={item.tray_id === selectedId} onSelect={() => setSelectedId(item.tray_id)} />
+            {filtered.map((item, i) => (
+              <TrayTile key={item.tray_id} tourTarget={i === 0} tray={item} today={today} dueSoonDays={dueSoonDays} selected={item.tray_id === selectedId} onSelect={() => setSelectedId(item.tray_id)} />
             ))}
           </AnimatePresence>
         </motion.ul>
@@ -291,7 +291,7 @@ function UrgencyBadge({ u, due, today, lifecycle }: { u: Urgency | null; due: st
   return <span className="text-xs text-muted">{t("Due")} {fmt.day(due, "d MMM")}</span>;
 }
 
-function TrayTile({ tray: tr, today, dueSoonDays, selected, onSelect }: { tray: TrayRow; today: string; dueSoonDays: number; selected: boolean; onSelect: () => void }) {
+function TrayTile({ tray: tr, today, dueSoonDays, selected, onSelect, tourTarget }: { tray: TrayRow; today: string; dueSoonDays: number; selected: boolean; onSelect: () => void; tourTarget?: boolean }) {
   const { t } = useI18n();
   const s = stateOf(tr);
   const u = urgencyOf(tr.due_date, today, dueSoonDays, tr.lifecycle);
@@ -300,6 +300,7 @@ function TrayTile({ tray: tr, today, dueSoonDays, selected, onSelect }: { tray: 
     : t(s === "available" ? "Available — click to place a case" : "Deactivated");
   return (
     <motion.li
+      data-tour={tourTarget ? "tray-tile" : undefined}
       layout
       variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
       exit={{ opacity: 0, scale: 0.96 }}

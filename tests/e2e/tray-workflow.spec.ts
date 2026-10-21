@@ -22,13 +22,13 @@ test("case lifecycle: create in a tray → complete (tray stays occupied) → co
 
   // The tray board shows it occupied by this case.
   await page.goto(`/trays`);
-  await page.getByLabel("Search trays").fill(ref);
+  await page.getByRole("textbox", { name: "Search trays" }).fill(ref);
   const tile = page.getByRole("button", { name: new RegExp(`Tray ${trayNo}: occupied, case ${ref}`) });
   await expect(tile).toBeVisible();
 
   // Move through the workflow to Completed.
   await page.goto("/cases");
-  await page.getByLabel("Search cases").fill(ref);
+  await page.getByRole("textbox", { name: "Search cases" }).fill(ref);
   await expect(page.getByText("1 case", { exact: true })).toBeVisible();
   await page.getByRole("link", { name: ref }).click();
   await expect(page.getByRole("heading", { level: 1, name: ref })).toBeVisible();
@@ -38,7 +38,7 @@ test("case lifecycle: create in a tray → complete (tray stays occupied) → co
 
   // Completing did NOT release the tray.
   await page.goto("/trays");
-  await page.getByLabel("Search trays").fill(ref);
+  await page.getByRole("textbox", { name: "Search trays" }).fill(ref);
   await expect(page.getByRole("button", { name: new RegExp(`Tray ${trayNo}: occupied`) })).toBeVisible();
 
   // Release requires the explicit "physically empty" confirmation.
@@ -53,7 +53,7 @@ test("case lifecycle: create in a tray → complete (tray stays occupied) → co
   // The open panel updates in place, then the board shows the tray as available.
   await expect(page.getByRole("img", { name: `Tray ${trayNo}, available` })).toBeVisible();
   await page.getByRole("button", { name: "Close panel" }).click();
-  await page.getByLabel("Search trays").fill(trayNo.slice(1));
+  await page.getByRole("textbox", { name: "Search trays" }).fill(trayNo.slice(1));
   await expect(page.getByRole("button", { name: `Tray ${trayNo}: available` })).toBeVisible();
 });
 
