@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useI18n } from "@/components/i18n-provider";
 import { cn } from "@/lib/utils";
 import { useTour } from "./tour-provider";
+import { LanguageSwitch } from "@/components/shell/switches";
 
 type Rect = { top: number; left: number; width: number; height: number };
 const PAD = 8;
@@ -234,6 +235,8 @@ export function TourOverlay() {
               {t(step.title)}
             </h2>
           </div>
+          {/* The page's language switch is under the overlay, so the tour carries its own. */}
+          <LanguageSwitch className="h-8 shrink-0 [&_button]:h-6" />
           <button
             onClick={tour.pause}
             className="-mr-1.5 rounded-md p-1.5 text-muted transition-colors hover:bg-surface-2 hover:text-ink"

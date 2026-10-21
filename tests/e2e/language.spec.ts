@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { ADMIN, dismissTourInvite, login, uniq } from "./helpers";
+import { ADMIN, login, uniq } from "./helpers";
 
 // The language switch must change the interface immediately, without waiting for the server,
 // and the choice must survive navigation, refresh and signing in again.
@@ -63,10 +63,42 @@ test.describe("mobile", () => {
     await page.reload();
     await expect(page.getByRole("button", { name: "Hap navigimin" })).toBeVisible();
   });
+
+  test("the mobile menu switch alternates EN → SQ → EN → SQ → EN", async ({ page }) => {
+    await login(page);
+    await page.getByRole("button", { name: "Open navigation" }).click();
+    const drawer = () => page.getByRole("dialog");
+    await alternate(page, "mobile menu", drawer, (l) => drawer().getByRole("link", { name: l === "EN" ? "Dashboard" : "Paneli" }));
+  });
 });
 
-test("setup wizard and guided tour follow the language switch", async ({ page }) => {
-  test.setTimeout(150_000);
+type Lang = "EN" | "SQ";
+const SEQUENCE: Lang[] = ["EN", "SQ", "EN", "SQ", "EN"];
+const RADIO = { EN: "English", SQ: "Shqip" } as const;
+
+/**
+ * Regression test for one-way switching: click EN → SQ → EN → SQ → EN on the given switch and,
+ * after every click, check the visible text and the switch state within one second, while the
+ * server is held back (so nothing can depend on a server round trip).
+ */
+async function alternate(page: Page, where: string, scope: () => import("@playwright/test").Locator, text: (l: Lang) => import("@playwright/test").Locator) {
+  await slowServer(page, 4000);
+  for (const l of SEQUENCE) {
+    await scope().getByRole("radio", { name: RADIO[l] }).click();
+    await expect(text(l), `${where}: after clicking ${l}`).toBeVisible({ timeout: 1000 });
+    await expect(scope().getByRole("radio", { name: RADIO[l] }), `${where}: ${l} selected`).toHaveAttribute("aria-checked", "true", { timeout: 1000 });
+  }
+  await page.unroute("**/*");
+}
+
+test("both directions work repeatedly on every page, including the tour", async ({ page }) => {
+  test.setTimeout(240_000);
+
+  // sign-in page (signed out)
+  await page.goto("/login");
+  await alternate(page, "login", () => page.locator("body"), (l) => page.getByRole("heading", { name: l === "EN" ? "Sign in" : "Hyr" }));
+
+  // setup wizard
   const email = `${uniq().toLowerCase()}@lang.dentrack.test`;
   await page.goto("/signup");
   await page.getByLabel("Full name").fill("Lena Lang");
@@ -74,40 +106,54 @@ test("setup wizard and guided tour follow the language switch", async ({ page })
   await page.getByLabel("Password", { exact: true }).fill("first-time-pass");
   await page.getByRole("button", { name: "Create account" }).click();
   await expect(page.getByRole("heading", { name: "Welcome to DENTRACK" })).toBeVisible({ timeout: 60_000 });
+  await alternate(page, "onboarding", () => page.locator("body"), (l) => page.getByRole("heading", { name: l === "EN" ? "Welcome to DENTRACK" : "Mirë se vini në DENTRACK" }));
 
-  await slowServer(page, 6000);
+  // finish the wizard in Albanian (the situation that used to trap people in Albanian)
   await page.getByRole("radio", { name: "Shqip" }).click();
-  await expect(page.getByRole("heading", { name: "Mirë se vini në DENTRACK" })).toBeVisible({ timeout: 1000 });
-  await expect(page.getByRole("button", { name: "Krijo laboratorin tim" })).toBeVisible({ timeout: 1000 });
-  await page.unroute("**/*");
-
   await page.getByRole("button", { name: "Krijo laboratorin tim" }).click();
-  await expect(page.getByRole("heading", { name: "Laboratori juaj" })).toBeVisible();
   await page.getByLabel("Emri i laboratorit").fill("Laboratori Lena");
   await page.getByRole("button", { name: "Vazhdo" }).click();
-  await expect(page.getByRole("heading", { name: "Tabakatë tuaja të numëruara" })).toBeVisible();
   await expect(page.getByText("Do të krijohen 24 tabaka dixhitale: nga #001 deri në #024.")).toBeVisible();
   await page.getByRole("button", { name: "Krijo laboratorin" }).click();
-  await expect(page.getByRole("heading", { name: "Laboratori juaj është gati" })).toBeVisible();
   await page.getByRole("link", { name: "Shko te paneli im" }).click();
 
-  const invite = page.getByRole("dialog", { name: "Mirë se vini në DENTRACK!" });
-  await expect(invite).toBeVisible();
-  await invite.getByRole("button", { name: "Nis udhëzuesin" }).click();
-  const tour = page.getByRole("dialog").filter({ hasText: /Hapi \d nga \d/ });
-  await expect(tour.getByText("Hapi 1 nga 6")).toBeVisible();
-  await expect(tour.getByRole("heading", { name: "Paneli juaj" })).toBeVisible();
-  await tour.getByRole("button", { name: "Tjetri" }).click();
-  await expect(tour.getByRole("heading", { name: "Tabaka të numëruara" })).toBeVisible();
-  await tour.getByRole("button", { name: "Kapërce udhëzuesin" }).click();
+  // the tour invitation covers the page: its own switch must work in both directions
+  const invite = () => page.getByRole("dialog").filter({ has: page.getByRole("button", { name: /Start tutorial|Nis udhëzuesin/ }) });
+  await expect(invite()).toBeVisible();
+  await alternate(page, "tour invitation", invite, (l) => invite().getByRole("heading", { name: l === "EN" ? "Welcome to DENTRACK!" : "Mirë se vini në DENTRACK!" }));
+  // clicking outside no longer dismisses it (it used to swallow clicks on the header switch and count as "skip")
+  await page.mouse.click(5, 5);
+  await expect(invite()).toBeVisible();
 
-  // switch back to English: the open page (and the Help menu) follow immediately
-  await slowServer(page, 6000);
+  // the open tour: its own switch
+  await invite().getByRole("button", { name: "Start tutorial" }).click();
+  const tour = () => page.getByRole("dialog").filter({ hasText: /Step \d of \d|Hapi \d nga \d/ });
+  await expect(tour().getByText("Step 1 of 6")).toBeVisible();
+  await alternate(page, "guided tour", tour, (l) => tour().getByRole("heading", { name: l === "EN" ? "Your dashboard" : "Paneli juaj" }));
+  await tour().getByRole("button", { name: "Next" }).click();
+  await expect(tour().getByRole("heading", { name: "Numbered trays" })).toBeVisible();
+  await tour().getByRole("radio", { name: "Shqip" }).click();
+  await expect(tour().getByRole("heading", { name: "Tabaka të numëruara" })).toBeVisible({ timeout: 1000 });
+  await tour().getByRole("radio", { name: "English" }).click();
+  await expect(tour().getByRole("heading", { name: "Numbered trays" })).toBeVisible({ timeout: 1000 });
+  await tour().getByRole("button", { name: "Skip tour" }).click();
+
+  // dashboard and settings: the header switch
+  await page.goto("/dashboard");
+  await alternate(page, "dashboard", () => page.locator("header"), (l) => page.getByRole("link", { name: l === "EN" ? "Tray board" : "Tabela e tabakave" }).first());
+  await page.goto("/settings");
+  await alternate(page, "settings", () => page.locator("header"), (l) => page.getByRole("heading", { level: 1, name: l === "EN" ? "Settings" : "Cilësimet" }));
+
+  // the last choice (EN) survives a refresh; then SQ survives navigation and refresh
+  await page.reload();
+  await expect(page.getByRole("heading", { level: 1, name: "Settings" })).toBeVisible();
+  await page.locator("header").getByRole("radio", { name: "Shqip" }).click();
+  await page.getByRole("link", { name: "Rastet" }).first().click();
+  await expect(page.getByRole("heading", { level: 1, name: "Rastet" })).toBeVisible();
+  await page.reload();
+  await expect(page.getByRole("heading", { level: 1, name: "Rastet" })).toBeVisible();
   await page.locator("header").getByRole("radio", { name: "English" }).click();
-  await expect(page.getByRole("heading", { level: 1, name: "Tray board" })).toBeVisible({ timeout: 1000 });
-  await page.unroute("**/*");
-  await page.getByRole("button", { name: "Help", exact: true }).click();
-  await expect(page.getByRole("menuitem", { name: "Restart the guided tour" })).toBeVisible();
-  await page.keyboard.press("Escape");
-  await dismissTourInvite(page);
+  await expect(page.getByRole("heading", { level: 1, name: "Cases" })).toBeVisible({ timeout: 1000 });
+  await page.goBack();
+  await expect(page.getByRole("heading", { level: 1, name: "Settings" })).toBeVisible();
 });

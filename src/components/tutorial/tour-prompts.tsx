@@ -6,6 +6,7 @@ import { Dialog } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useI18n } from "@/components/i18n-provider";
 import { useTour } from "./tour-provider";
+import { LanguageSwitch } from "@/components/shell/switches";
 
 /** Asked once per laboratory (not if the tour was completed in another laboratory). */
 export function TourWelcome({ open, onStart, onSkip }: { open: boolean; onStart: () => void; onSkip: () => void }) {
@@ -17,6 +18,7 @@ export function TourWelcome({ open, onStart, onSkip }: { open: boolean; onStart:
       title="Welcome to DENTRACK!"
       description="Would you like a quick guided tour to learn how everything works?"
       size="sm"
+      closeOnOutsideClick={false}
       footer={
         <>
           <Button variant="ghost" onClick={onSkip}>{t("Skip for now")}</Button>
@@ -29,6 +31,11 @@ export function TourWelcome({ open, onStart, onSkip }: { open: boolean; onStart:
         <p className="text-[13.5px] text-ink-2">
           {t("It takes about two minutes, shows the real screens and doesn't change any of your data. You can skip it and start it any time from Help, the ? button at the top.")}
         </p>
+      </div>
+      {/* The page's own switches are behind this dialog, so it carries its own. */}
+      <div className="mt-4 flex items-center justify-between gap-3 border-t border-line pt-3">
+        <span className="text-[12.5px] text-muted">{t("Language")}</span>
+        <LanguageSwitch />
       </div>
     </Dialog>
   );

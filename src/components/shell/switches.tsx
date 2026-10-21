@@ -26,6 +26,9 @@ export function ThemeSwitch({ onChange, className, tone = "default" }: { onChang
     return () => obs.disconnect();
   }, []);
   const choose = (v: Theme) => { setTheme(v); applyTheme(v); onChange?.(v); };
+  // Each switch on the page gets its own thumb animation (the header, menu and drawer copies can be
+  // mounted at the same time; a shared id would move the thumb between them).
+  const thumbId = `theme-thumb-${React.useId()}`;
 
   return (
     <div
@@ -55,7 +58,7 @@ export function ThemeSwitch({ onChange, className, tone = "default" }: { onChang
           >
             {active && (
               <motion.span
-                layoutId={`theme-thumb-${tone}`}
+                layoutId={thumbId}
                 className="absolute inset-0 rounded-full bg-surface shadow-soft ring-1 ring-line dark:bg-deep"
                 transition={{ type: "spring", stiffness: 500, damping: 35 }}
               />
@@ -72,6 +75,7 @@ export function ThemeSwitch({ onChange, className, tone = "default" }: { onChang
 export function LanguageSwitch({ className, tone = "default" }: { className?: string; tone?: "default" | "onDark" }) {
   const { lang, t } = useI18n();
   const { setLanguage, pending } = useSetLanguage();
+  const thumbId = `lang-thumb-${React.useId()}`;
   const items: Array<{ v: Lang; short: string; long: string }> = [
     { v: "en", short: "EN", long: "English" },
     { v: "sq", short: "SQ", long: "Shqip" },
@@ -106,7 +110,7 @@ export function LanguageSwitch({ className, tone = "default" }: { className?: st
           >
             {active && (
               <motion.span
-                layoutId={`lang-thumb-${tone}`}
+                layoutId={thumbId}
                 className="absolute inset-0 rounded-full bg-surface shadow-soft ring-1 ring-line dark:bg-deep"
                 transition={{ type: "spring", stiffness: 500, damping: 35 }}
               />

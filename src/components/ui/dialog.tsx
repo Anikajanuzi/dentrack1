@@ -15,10 +15,12 @@ interface DialogProps {
   children: React.ReactNode;
   footer?: React.ReactNode;
   size?: "sm" | "md" | "lg";
+  /** false: clicking outside doesn't close it (only its own buttons, the X and Esc do). */
+  closeOnOutsideClick?: boolean;
 }
 
 /** Centered modal. Animated scale/fade in, respects reduced motion via MotionConfig. */
-export function Dialog({ open, onOpenChange, title, description, children, footer, size = "md" }: DialogProps) {
+export function Dialog({ open, onOpenChange, title, description, children, footer, size = "md", closeOnOutsideClick = true }: DialogProps) {
   const { t } = useI18n();
   return (
     <D.Root open={open} onOpenChange={onOpenChange}>
@@ -34,7 +36,7 @@ export function Dialog({ open, onOpenChange, title, description, children, foote
                 transition={{ duration: 0.18 }}
               />
             </D.Overlay>
-            <D.Content asChild forceMount aria-describedby={description ? undefined : undefined}>
+            <D.Content asChild forceMount aria-describedby={description ? undefined : undefined} onInteractOutside={closeOnOutsideClick ? undefined : (e) => e.preventDefault()}>
               <motion.div
                 className={cn(
                   "fixed left-1/2 top-1/2 z-50 flex max-h-[calc(100dvh-2rem)] w-[calc(100vw-2rem)] flex-col rounded-3xl border border-line bg-surface shadow-float outline-none",
